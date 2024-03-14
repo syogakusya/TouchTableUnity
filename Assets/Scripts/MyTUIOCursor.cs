@@ -12,15 +12,16 @@ public class MyTUIOCursor : MonoBehaviour
 {
     private TuioServer _tuioServer;
     private Dictionary<Int32, TuioCursor> _cursorList = null;
-    [SerializeField] VisualEffect effect;
-    private Dictionary<Int32, VisualEffect> effectList = null;
-    public int scaleSize = 10;
+    [SerializeField] GameObject tracker;
+    private Dictionary<Int32, GameObject> trackerList = null;
+    public float scaleSizeX = 10;
+    public float scaleSizeY = 10;
 
     void Start()
     {
         _cursorList = new Dictionary<Int32, TuioCursor>();
         _tuioServer = new TuioServer();
-        effectList = new Dictionary<int, VisualEffect>();
+        trackerList = new Dictionary<int, GameObject>();
         var cursorProcessor = new CursorProcessor();
 
         // 新しく発生した点データを受信
@@ -51,26 +52,26 @@ public class MyTUIOCursor : MonoBehaviour
         foreach (var key in _cursorList.Keys)
         {
             _cursorList.TryGetValue(key, out var cursor);
-            var p = new Vector3(cursor.X * scaleSize, cursor.Y * scaleSize, 0);
+            var p = new Vector3(cursor.X * scaleSizeX, cursor.Y * scaleSizeY, 0);
             Debug.Log($"Key {key} {cursor.X} {cursor.Y}");
 
-            if (!effectList.ContainsKey(key))
+            if (!trackerList.ContainsKey(key))
             {
-                var tmpObject = Instantiate(effect, p, Quaternion.identity);
-                effectList.Add(key, tmpObject);
+                var tmpObject = Instantiate(tracker, p, Quaternion.identity);
+                trackerList.Add(key, tmpObject);
             }
             else
             {
-                effectList[key].transform.position = p;
+                trackerList[key].transform.position = p;
             }
         }
 
-        foreach(var key in effectList.Keys)
+        foreach(var key in trackerList.Keys)
         {
             if (!_cursorList.ContainsKey(key))
             {
-                Destroy(effectList[key].gameObject);
-                effectList.Remove(key);
+                Destroy(trackerList[key].gameObject);
+                trackerList.Remove(key);
             }
                 
         }
